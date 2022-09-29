@@ -121,11 +121,12 @@ extension CameraView: AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAud
         callback.reject(error: .capture(.createRecorderError(message: "Failed to get video settings!")))
         return
       }
+            
 
       // get pixel format (420f, 420v, x420)
       let pixelFormat = CMFormatDescriptionGetMediaSubType(videoInput.device.activeFormat.formatDescription)
       recordingSession.initializeVideoWriter(withSettings: videoSettings,
-                                             pixelFormat: pixelFormat)
+                                                                    pixelFormat: pixelFormat, isFrontCamera: videoInput.device.position == .front)
 
       // Init Audio (optional, async)
       if enableAudio {
@@ -137,7 +138,7 @@ extension CameraView: AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAud
           recordingSession.initializeAudioWriter(withSettings: audioSettings)
         }
       }
-
+        
       // start recording session with or without audio.
       do {
         try recordingSession.startAssetWriter()
