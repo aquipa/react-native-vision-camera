@@ -70,24 +70,30 @@ class RecordingSession {
   /**
    Initializes an AssetWriter for video frames (CMSampleBuffers).
    */
-  func initializeVideoWriter(withSettings settings: [String: Any], pixelFormat: OSType) {
+    func initializeVideoWriter(withSettings settings: [String: Any], pixelFormat: OSType, isFrontCamera: Bool) {
     guard !settings.isEmpty else {
       ReactLogger.log(level: .error, message: "Tried to initialize Video Writer with empty settings!")
-      return
+        return;
     }
     guard bufferAdaptor == nil else {
       ReactLogger.log(level: .error, message: "Tried to add Video Writer twice!")
-      return
+        return;
     }
 
     let videoWriter = AVAssetWriterInput(mediaType: .video, outputSettings: settings)
     videoWriter.expectsMediaDataInRealTime = true
+        
+    if (isFrontCamera) {
+      var transform = CGAffineTransform(scaleX: -1.0, y: 1.0);
+      videoWriter.transform = transform
+    }
 
     assetWriter.add(videoWriter)
     bufferAdaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: videoWriter,
                                                          withVideoSettings: settings,
                                                          pixelFormat: pixelFormat)
     ReactLogger.log(level: .info, message: "Initialized Video AssetWriter.")
+    return;
   }
 
   /**
